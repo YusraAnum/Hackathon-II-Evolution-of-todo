@@ -1,7 +1,4 @@
 __pycache__/
-.claude/
-.specify/
-history/
 tmpclaude-*/
 *.pyc
 *.pyo
