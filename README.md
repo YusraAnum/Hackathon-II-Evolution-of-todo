@@ -1,22 +1,19 @@
 # Hackathon II: Evolution of Todo App - Phase 1
 
-## Overview
-This is Phase 1 of the Hackathon II: Evolution of Todo App project, implementing an in-memory CLI-based Todo application following Spec-Driven Development (SDD) methodology. This phase focuses on creating a foundational todo system with core functionality.
+## Description
+Phase 1 – In-Memory CLI Todo Application
 
-## Phase 1 Goals
-- Implement an in-memory CLI-based todo application
-- Establish a solid foundation for future phases
-- Demonstrate Spec-Driven Development workflow
-- Include comprehensive testing and documentation
+A command-line interface todo application that implements core todo functionality with in-memory storage. This phase focuses on establishing a solid foundation with essential features.
 
 ## Features
-- **CLI Interface**: Command-line interface for todo management
-- **Core Operations**: Add, list, complete, and delete todo items
-- **In-Memory Storage**: Todos are stored in memory for this phase
-- **Testing Framework**: Comprehensive tests for all functionality
-- **Specification Artifacts**: Complete SDD documentation and planning
+- Add new todo items
+- List all todos with status
+- View individual todo details
+- Update todo content
+- Delete todos
+- Mark todos as complete/incomplete
 
-## Project Structure
+## Folder Structure
 ```
 ├── src/                    # Source code
 │   ├── cli.py             # Command-line interface
@@ -26,39 +23,25 @@ This is Phase 1 of the Hackathon II: Evolution of Todo App project, implementing
 │   │   └── storage.py     # Storage implementation
 │   └── services/          # Business logic services
 │       └── todo_service.py # Todo business logic
-├── specs/                 # Specification artifacts
-│   └── todo-system/       # Todo system specifications
+├── specs/                 # Specifications
 ├── tests/                 # Test suite
+├── history/               # Development history
+├── .claude/               # Configuration files
+├── .specify/              # Specification files
 ├── main.py               # Entry point
 ├── comprehensive_test.py # Comprehensive test runner
+├── AGENTS.md             # Agent configuration
+├── CLAUDE.md             # Claude configuration
 └── README.md             # This file
 ```
 
-## Included Artifacts
-This repository intentionally includes full Spec-Driven Development artifacts:
-- **.claude/**: Claude Code configuration and agent files
-- **.specify/**: SDD memory and scripts
-- **history/**: Development history
-- **specs/**: Detailed specifications and plans
-
-## Prerequisites
-- Python 3.8+
-
 ## How to Run
-1. Clone the repository
-2. Navigate to the project directory
-3. Run the application:
-   ```bash
-   python main.py
-   ```
+Run the CLI application:
+```bash
+python main.py
+```
 
-## Available Commands
-- `add <task>`: Add a new todo
-- `list`: List all todos
-- `complete <id>`: Mark a todo as complete
-- `delete <id>`: Delete a todo
-
-## Testing
+## How to Run Tests
 Run the test suite:
 ```bash
 python -m pytest tests/
@@ -69,15 +52,9 @@ Or run the comprehensive test:
 python comprehensive_test.py
 ```
 
-## Development Approach
-This project follows strict Spec-Driven Development (SDD) methodology:
-1. Constitution
-2. Specification
-3. Plan
-4. Tasks
-5. Implementation
-
-All AI agents operate within these defined rules, ensuring consistent and well-documented development.
-
-## Next Phases
-Future phases will expand upon this foundation with persistent storage, web interface, and advanced features.
+## Phase 1 Scope
+This is Phase 1 of the todo application, featuring:
+- CLI-based interaction only (no GUI/web interface)
+- In-memory storage only (no persistence to files or database)
+- Core todo operations (add, list, update, delete, mark complete)
+- Basic testing framework
