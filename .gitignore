@@ -9,6 +9,9 @@ venv/
 ENV/
 .venv/
 .env
+.env.local
+.env.production
+.env.development
 .pytest_cache/
 .coverage
 htmlcov/
@@ -22,3 +25,11 @@ coverage/
 *.log
 .DS_Store
 Thumbs.db
+*.db
+todo.db
+todo_app.db
+todo_api.db
+simple_todo.db
+todo_chatbot.db
+*.sqlite
+*.sqlite3
