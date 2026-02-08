@@ -1,3 +1,4 @@
+from .user import User
 from dataclasses import dataclass
 from typing import Optional
 from datetime import datetime
