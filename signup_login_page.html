@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Todo Chatbot - Signup/Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            display: none;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            margin-bottom: 20px;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            color: black;
+            width: 50%;
+            text-align: center;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+        .tabcontent.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Todo Chatbot</h1>
+        <p style="text-align: center;">Sign up or log in to access your AI-powered todo manager</p>
+        
+        <div class="tab">
+            <button class="tab-btn active" onclick="openTab(event, 'signup')">Sign Up</button>
+            <button class="tab-btn" onclick="openTab(event, 'login')">Log In</button>
+        </div>
+
+        <div id="signup" class="tabcontent active">
+            <h2>Create Account</h2>
+            <div class="form-group">
+                <label for="signup-username">Username:</label>
+                <input type="text" id="signup-username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email:</label>
+                <input type="email" id="signup-email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password:</label>
+                <input type="password" id="signup-password" placeholder="Enter password">
+            </div>
+            <button onclick="signup()">Sign Up</button>
+        </div>
+
+        <div id="login" class="tabcontent">
+            <h2>Login to Account</h2>
+            <div class="form-group">
+                <label for="login-username">Username:</label>
+                <input type="text" id="login-username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" placeholder="Enter password">
+            </div>
+            <button onclick="login()">Log In</button>
+        </div>
+
+        <div id="result" class="result">
+            <h3>Result:</h3>
+            <p id="result-text"></p>
+            <p><strong>Token stored in localStorage!</strong> You can now access the chatbot.</p>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabBtn;
+            
+            // Hide all tab content
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+            }
+            
+            // Remove active class from buttons
+            tabBtn = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tabBtn.length; i++) {
+                tabBtn[i].className = tabBtn[i].className.replace(" active", "");
+            }
+            
+            // Show the current tab and add active class to button
+            document.getElementById(tabName).className += " active";
+            evt.currentTarget.className += " active";
+        }
+
+        async function signup() {
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            
+            if (!username || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store the token in localStorage
+                    localStorage.setItem('auth_token', data.access_token);
+                    
+                    document.getElementById('result-text').innerHTML = 
+                        `<strong>Success!</strong> Signed up as <em>${username}</em><br>
+                         Token: ${data.access_token.substring(0, 30)}...`;
+                    document.getElementById('result').style.display = 'block';
+                    
+                    // Redirect to the chatbot after a delay
+                    setTimeout(() => {
+                        window.location.href = 'http://localhost:3000';
+                    }, 2000);
+                } else {
+                    throw new Error(data.detail || 'Signup failed');
+                }
+            } catch (error) {
+                document.getElementById('result-text').innerHTML = 
+                    `<strong>Error:</strong> ${error.message}`;
+                document.getElementById('result').style.display = 'block';
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store the token in localStorage
+                    localStorage.setItem('auth_token', data.access_token);
+                    
+                    document.getElementById('result-text').innerHTML = 
+                        `<strong>Success!</strong> Logged in as <em>${username}</em><br>
+                         Token: ${data.access_token.substring(0, 30)}...`;
+                    document.getElementById('result').style.display = 'block';
+                    
+                    // Redirect to the chatbot after a delay
+                    setTimeout(() => {
+                        window.location.href = 'http://localhost:3000';
+                    }, 2000);
+                } else {
+                    throw new Error(data.detail || 'Login failed');
+                }
+            } catch (error) {
+                document.getElementById('result-text').innerHTML = 
+                    `<strong>Error:</strong> ${error.message}`;
+                document.getElementById('result').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
