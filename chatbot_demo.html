@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Todo Chatbot Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .chat-container {
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            overflow-y: scroll;
+            background-color: #fafafa;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #e9ecef;
+            color: #333;
+        }
+        .input-container {
+            display: flex;
+        }
+        #messageInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #sendButton {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #sendButton:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .instructions {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Todo Chatbot Demo</h1>
+        
+        <div class="instructions">
+            <strong>Instructions:</strong> To test the AI chatbot, you need to:
+            <ol>
+                <li>Have the AI backend running on port 8000 (backend_todo_app)</li>
+                <li>Be logged in to get your user ID</li>
+                <li>Try commands like "Add a task to buy groceries" or "Show my tasks"</li>
+            </ol>
+        </div>
+        
+        <div id="chatContainer" class="chat-container">
+            <div class="message bot-message">
+                Hello! I'm your AI Todo assistant. Please make sure the backend is running on port 8000 and you have a valid user ID to interact with me.
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="messageInput" placeholder="Enter your message..." />
+            <button id="sendButton" onclick="sendMessage()">Send</button>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <label for="userIdInput">User ID: </label>
+            <input type="text" id="userIdInput" placeholder="Enter your user ID" style="padding: 5px; width: 300px;" />
+            <small>Get this from your authentication token after logging in</small>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        function addMessage(content, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+            messageDiv.textContent = content;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            const userId = document.getElementById('userIdInput').value.trim();
+            
+            if (!message) return;
+            if (!userId) {
+                alert('Please enter your user ID');
+                return;
+            }
+            
+            // Add user message to chat
+            addMessage(message, true);
+            messageInput.value = '';
+            sendButton.disabled = true;
+            
+            try {
+                // Send message to AI backend
+                const response = await fetch(`http://127.0.0.1:8000/api/${userId}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addMessage(data.response, false);
+                } else {
+                    addMessage(`Error: ${data.detail || 'Unknown error'}`, false);
+                }
+            } catch (error) {
+                addMessage(`Connection error: ${error.message}`, false);
+            } finally {
+                sendButton.disabled = false;
+                messageInput.focus();
+            }
+        }
+        
+        // Allow sending message with Enter key
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Focus on input when page loads
+        messageInput.focus();
+    </script>
+</body>
+</html>

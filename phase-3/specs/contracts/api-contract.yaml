@@ -1,0 +1,318 @@
+# API Contract: AI Todo Chatbot
+
+## Overview
+This document defines the API contracts for the AI Todo Chatbot feature based on the functional requirements.
+
+## Base URL
+`/api/{user_id}`
+
+## Authentication
+JWT Bearer token required for all endpoints except signup and login.
+Header: `Authorization: Bearer {token}`
+
+## Endpoints
+
+### User Authentication
+
+#### POST /auth/signup
+Register a new user account.
+
+**Request Body:**
+```json
+{
+  "username": "string (3-50 chars)",
+  "email": "valid email string",
+  "password": "string (min 8 chars with mixed case, number, special char)"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "integer",
+  "username": "string",
+  "email": "string",
+  "access_token": "jwt string",
+  "refresh_token": "jwt string"
+}
+```
+
+**Response (400 Bad Request):**
+```json
+{
+  "detail": "validation error message"
+}
+```
+
+#### POST /auth/login
+Authenticate user and return JWT tokens.
+
+**Request Body:**
+```json
+{
+  "username_or_email": "string",
+  "password": "string"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "access_token": "jwt string",
+  "refresh_token": "jwt string",
+  "token_type": "bearer"
+}
+```
+
+**Response (401 Unauthorized):**
+```json
+{
+  "detail": "invalid credentials message"
+}
+```
+
+#### POST /auth/logout
+Logout user and invalidate tokens.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "successfully logged out"
+}
+```
+
+### Task Management
+
+#### GET /tasks
+Retrieve all tasks for the authenticated user.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "tasks": [
+    {
+      "id": "integer",
+      "title": "string",
+      "description": "string or null",
+      "status": "string (active|completed)",
+      "due_date": "ISO datetime string or null",
+      "priority": "string (low|medium|high)",
+      "created_at": "ISO datetime string",
+      "updated_at": "ISO datetime string",
+      "completed_at": "ISO datetime string or null"
+    }
+  ]
+}
+```
+
+#### POST /tasks
+Create a new task for the authenticated user.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Request Body:**
+```json
+{
+  "title": "string (1-200 chars)",
+  "description": "string (0-1000 chars) or null",
+  "due_date": "ISO datetime string or null",
+  "priority": "string (low|medium|high) or null"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "integer",
+  "title": "string",
+  "description": "string or null",
+  "status": "string (active)",
+  "due_date": "ISO datetime string or null",
+  "priority": "string (low|medium|high)",
+  "created_at": "ISO datetime string",
+  "updated_at": "ISO datetime string",
+  "completed_at": "ISO datetime string or null"
+}
+```
+
+#### PUT /tasks/{task_id}
+Update an existing task for the authenticated user.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Request Body:**
+```json
+{
+  "title": "string (1-200 chars) or null",
+  "description": "string (0-1000 chars) or null",
+  "due_date": "ISO datetime string or null",
+  "priority": "string (low|medium|high) or null",
+  "status": "string (active|completed) or null"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "integer",
+  "title": "string",
+  "description": "string or null",
+  "status": "string (active|completed)",
+  "due_date": "ISO datetime string or null",
+  "priority": "string (low|medium|high)",
+  "created_at": "ISO datetime string",
+  "updated_at": "ISO datetime string",
+  "completed_at": "ISO datetime string or null"
+}
+```
+
+#### DELETE /tasks/{task_id}
+Delete a task for the authenticated user.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Response (204 No Content):**
+```
+[Empty response body]
+```
+
+#### PATCH /tasks/{task_id}/complete
+Mark a task as completed for the authenticated user.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "integer",
+  "title": "string",
+  "description": "string or null",
+  "status": "string (completed)",
+  "due_date": "ISO datetime string or null",
+  "priority": "string (low|medium|high)",
+  "created_at": "ISO datetime string",
+  "updated_at": "ISO datetime string",
+  "completed_at": "ISO datetime string"
+}
+```
+
+### AI Chat Interface
+
+#### POST /chat
+Process natural language input and return appropriate response with tool calls.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Request Body:**
+```json
+{
+  "conversation_id": "integer or null",
+  "message": "string (required, 1-5000 chars)"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "conversation_id": "integer",
+  "response": "string",
+  "tool_calls": [
+    {
+      "name": "string (add_task|list_tasks|update_task|complete_task|delete_task)",
+      "arguments": "object with appropriate parameters"
+    }
+  ]
+}
+```
+
+### Conversation Management
+
+#### GET /conversations
+Retrieve all conversations for the authenticated user.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "conversations": [
+    {
+      "id": "integer",
+      "title": "string or null",
+      "created_at": "ISO datetime string",
+      "updated_at": "ISO datetime string",
+      "is_active": "boolean"
+    }
+  ]
+}
+```
+
+#### GET /conversations/{conversation_id}/messages
+Retrieve all messages in a specific conversation.
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Response (200 OK):**
+```json
+{
+  "messages": [
+    {
+      "id": "integer",
+      "sender_type": "string (user|ai)",
+      "content": "string",
+      "timestamp": "ISO datetime string",
+      "tool_calls": "JSON object or null"
+    }
+  ]
+}
+```
+
+## Error Responses
+All error responses follow this format:
+```json
+{
+  "detail": "descriptive error message"
+}
+```
+
+HTTP Status Codes:
+- 200: Success
+- 201: Created
+- 204: No Content
+- 400: Bad Request (validation error)
+- 401: Unauthorized (authentication required/failed)
+- 403: Forbidden (insufficient permissions)
+- 404: Not Found
+- 422: Unprocessable Entity (validation error)
+- 500: Internal Server Error
