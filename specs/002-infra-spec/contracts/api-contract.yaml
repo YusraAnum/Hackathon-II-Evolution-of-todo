@@ -1,0 +1,180 @@
+# API Contract for Todo Application Backend
+
+openapi: 3.0.0
+info:
+  title: Todo Application Backend API
+  version: 1.0.0
+  description: API contract for the Todo application backend service
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://{environment}.todo-app.com/api
+    description: Production environment
+    variables:
+      environment:
+        default: prod
+        enum:
+          - dev
+          - staging
+          - prod
+
+paths:
+  /api/v1/health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the backend service
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  timestamp:
+                    type: string
+                    example: "2026-02-09T10:00:00Z"
+        '500':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "unhealthy"
+                  error:
+                    type: string
+                    example: "Database connection failed"
+
+  /api/v1/todos:
+    get:
+      summary: Get all todos
+      description: Retrieve a list of all todo items
+      responses:
+        '200':
+          description: List of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      summary: Create a new todo
+      description: Add a new todo item to the list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoInput'
+      responses:
+        '201':
+          description: Todo created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+
+  /api/v1/todos/{id}:
+    get:
+      summary: Get a specific todo
+      description: Retrieve a specific todo item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Todo retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo not found
+    put:
+      summary: Update a specific todo
+      description: Modify an existing todo item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoInput'
+      responses:
+        '200':
+          description: Todo updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo not found
+    delete:
+      summary: Delete a specific todo
+      description: Remove a specific todo item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Todo deleted successfully
+        '404':
+          description: Todo not found
+
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Buy groceries"
+        description:
+          type: string
+          example: "Milk, eggs, bread"
+        completed:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-02-09T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-02-09T10:00:00Z"
+    
+    TodoInput:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Buy groceries"
+        description:
+          type: string
+          example: "Milk, eggs, bread"
+        completed:
+          type: boolean
+          example: false

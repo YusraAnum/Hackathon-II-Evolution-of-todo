@@ -1,0 +1,22 @@
+# Development-specific values for todo-app-chart
+
+frontend:
+  replicaCount: 2
+  image:
+    repository: todo-frontend
+    tag: latest
+
+backend:
+  replicaCount: 2
+  image:
+    repository: todo-backend
+    tag: latest
+
+# Development-specific configurations
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi

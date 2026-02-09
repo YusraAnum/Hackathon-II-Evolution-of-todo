@@ -1,13 +1,13 @@
 <!-- SYNC IMPACT REPORT:
-Version change: 1.0.0 -> 1.1.0 (minor update - adding new principles)
-Added sections: Monorepo Structure Rule, Technology Stack Lock, No Assumptions Rule
-Removed sections: None
+Version change: 1.1.0 -> 1.2.0 (minor update - adding new principles for Phase 4)
+Added sections: Infrastructure-Only Constraint, Containerization Mandate, Orchestration Requirement, Configuration Management Policy
+Removed sections: In-Memory Only Architecture, Minimal Backend-Only Functionality, No Future-Phase Features (Phase 1 specific)
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ updated
   - .specify/templates/spec-template.md ✅ updated
   - .specify/templates/tasks-template.md ✅ updated
   - .specify/templates/commands/*.md ⚠ pending
-Removed sections: None
+Removed sections: In-Memory Only Architecture, Minimal Backend-Only Functionality, No Future-Phase Features (Phase 1 specific)
 Follow-up TODOs: None
 -->
 # Hackathon II — The Evolution of Todo App Constitution
@@ -15,22 +15,28 @@ Follow-up TODOs: None
 ## Core Principles
 
 ### Strict Adherence to Spec-Driven Development (SDD)
-Phase 1 must follow the exact sequence: Constitution → Specification → Plan → Tasks → Implementation. No deviations or skipping of phases are permitted. All work must be traceable through this sequence.
+All phases must follow the exact sequence: Constitution → Specification → Plan → Tasks → Implementation. No deviations or skipping of phases are permitted. All work must be traceable through this sequence.
 
 ### Phase Isolation and Scope Control
-Phase 1 must not include or anticipate features intended for future phases. The system must remain focused solely on in-memory Todo functionality without planning for persistence, UI, or authentication. Simplicity and clarity over extensibility.
+Each phase must not include or anticipate features intended for other phases. Current work must remain focused solely on infrastructure and deployment concerns without altering business logic. Simplicity and clarity over feature development.
 
 ### Deterministic and Reproducible Behavior
-All functionality must behave predictably and consistently. The in-memory Todo system must have deterministic outcomes for all operations. All behavior must be traceable from specification to implementation.
+All infrastructure and deployment configurations must behave predictably and consistently. Deployments must have deterministic outcomes for all operations. All behavior must be traceable from specification to implementation.
 
-### In-Memory Only Architecture
-The Todo management system must operate solely in memory with no persistence beyond runtime. No databases, file-based storage, or external persistence mechanisms are allowed. State exists only during program execution.
+### Infrastructure-Only Constraint
+Phase 4 work must focus exclusively on infrastructure and deployment. No new application features are permitted. No business logic changes are allowed. Existing Phase 3 frontend and backend must be used as-is without modifications.
 
-### Minimal Backend-Only Functionality
-Phase 1 is strictly backend/logic-only with no UI, web frameworks, APIs, or external services. The system implements core Todo CRUD operations (Create, Read, List, Update, Delete) without user interfaces or network exposure.
+### Containerization Mandate
+Docker must be used for containerization of all application components. All services must be packaged in containers following industry best practices. Images must be optimized for size and security.
 
-### No Future-Phase Features
-No authentication, authorization, databases, file persistence, web frameworks, UI components, or scalability optimizations are allowed in Phase 1. All such features are explicitly forbidden until future phases.
+### Orchestration Requirement
+Kubernetes (Minikube) must be used for orchestration. All deployment configurations must be compatible with Kubernetes environments. Helm must be used to manage Kubernetes manifests for consistent deployments.
+
+### Configuration Management Policy
+Secrets must NOT be hardcoded in any configuration files. Environment variables must be injected at runtime through secure mechanisms. No sensitive information should be stored in plain text in the repository.
+
+### Local Deployment Focus
+Deployment targets must be limited to local Kubernetes (Minikube) only. No cloud deployment is permitted in Phase 4. All configurations must be validated in local Minikube environment.
 
 ### Monorepo Structure Rule
 The project MUST follow this folder structure for Phase 2 and beyond:
@@ -80,11 +86,11 @@ If something is unclear, Claude must STOP and ask instead of assuming.
 - MCP Server
 - No manual coding outside the defined workflow
 - No external libraries beyond core language features
-- No web frameworks or server implementations (for Phase 1)
-- For Phase 2+: FastAPI, PostgreSQL, SQLAlchemy, Alembic, Next.js 14, TypeScript, Tailwind CSS, Better Auth only
+- For Phase 4: Docker, Kubernetes (Minikube), Helm only for infrastructure/deployment
+- No changes to existing application codebase
 
 ## Governance
 
-All development must strictly comply with these principles. Any deviation requires explicit amendment to this constitution following the established SDD process. Code reviews must verify compliance with Phase 1 scope limitations. The constitution serves as the governing authority superseding all other practices during Phase 1 development.
+All development must strictly comply with these principles. Any deviation requires explicit amendment to this constitution following the established SDD process. Code reviews must verify compliance with Phase 4 scope limitations. The constitution serves as the governing authority superseding all other practices during Phase 4 development.
 
-**Version**: 1.1.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-01-25
+**Version**: 1.2.0 | **Ratified**: 2026-01-21 | **Last Amended**: 2026-02-09
